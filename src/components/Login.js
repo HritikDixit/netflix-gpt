@@ -4,14 +4,18 @@ import { checkValidateFunction } from "../utils/validateFunction";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  updateProfile,
 } from "firebase/auth";
 import { auth } from "../utils/firebase";
-import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { addUser } from "../utils/userSlice";
+import { profile_photo, netflix_bg } from "../utils/constant";
 
 const Login = () => {
   const [isSignForm, setIsSignForm] = useState(true);
-  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
+  const name = useRef(null);
   const email = useRef(null);
   const password = useRef(null);
 
@@ -32,8 +36,26 @@ const Login = () => {
           // Signed up
           console.log(emailValue, "-", passwordValue);
           const user = userCredential.user;
-          console.log("User signed up:", user);
-          navigate("/browse");
+          updateProfile(auth.currentUser, {
+            displayName: name.current.value,
+            photoURL: profile_photo,
+          })
+            .then(() => {
+              console.log("User signed up:", user);
+              const { uid, email, displayName, photoURL } = auth.currentUser;
+              dispatch(
+                addUser({
+                  uid: uid,
+                  email: email,
+                  displayName: displayName,
+                  photoURL: photoURL,
+                })
+              );
+            })
+            .catch((error) => {
+              // An error occurred
+              // ...
+            });
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -47,7 +69,6 @@ const Login = () => {
           // Signed in
           const user = userCredential.user;
           console.log("User signed in:", user);
-          navigate("/browse");
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -66,7 +87,7 @@ const Login = () => {
       <Header />
       <div className="absolute">
         <img
-          src="https://assets.nflxext.com/ffe/siteui/vlv3/9a924b36-8e85-4f2a-baac-ce2872ee8163/web/IN-en-20250714-TRIFECTA-perspective_dfbf09de-9182-41e1-a9c6-cd7b1a6d84d6_large.jpg"
+          src= {netflix_bg}
           alt="Netflix bg image"
         />
       </div>
@@ -83,6 +104,7 @@ const Login = () => {
         {!isSignForm && (
           <input
             type="text"
+            ref={name}
             placeholder="Full Name"
             className="py-2 m-2 px-2 w-full rounded-lg"
           />

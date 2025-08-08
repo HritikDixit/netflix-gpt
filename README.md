@@ -2,6 +2,10 @@
 
 - Create React App
 - Configured TailwindCSS
+- BugFix : Sign up user displayName and profile picture update
+- BigFix : if the user is not logged in redirect/browse to login Page and vice-versa
+- Cleanup onAuthStateChanged on unmount
+- added urls in constant files
 
 # Features
 
